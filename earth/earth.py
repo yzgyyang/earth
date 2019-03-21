@@ -4,6 +4,7 @@ import shutil
 import subprocess
 import urllib.request
 
+from datetime import datetime
 from PIL import Image
 
 import config
@@ -29,17 +30,17 @@ EARTH_Y_OFFSET = int((SCREEN_Y_LEN - RESIZE_LEN) / 2)
 class Earth:
     @staticmethod
     def get():
-        with urllib.request.urlopen(config.EARTH_URI) as res, open(config.FILE_PATH, 'wb') as f:
+        with urllib.request.urlopen(config.EARTH_URI) as res, open(get_download_file_path(), 'wb') as f:
             shutil.copyfileobj(res, f)
 
     @staticmethod
-    def set():
+    def set(file_path):
         script_dir = os.path.dirname(__file__)
-        subprocess.call(["osascript", os.path.join(script_dir, "scripts/macos.scpt"), config.FILE_PATH_PNG])
+        subprocess.call(["osascript", os.path.join(script_dir, "scripts/macos.scpt"), file_path])
 
     @staticmethod
     def resize():
-        im = Image.open(config.FILE_PATH)
+        im = Image.open(get_download_file_path())
 
         # Resize Earth
         im.thumbnail((RESIZE_LEN, RESIZE_LEN), Image.ANTIALIAS)
@@ -53,10 +54,30 @@ class Earth:
         res.paste(im, (EARTH_X_OFFSET, EARTH_Y_OFFSET))
 
         # Save to PNG file
-        res.save(config.FILE_PATH_PNG)
+        save_file_path = get_save_file_path()
+        res.save(save_file_path)
+
+        return save_file_path
+
+
+def get_download_file_path():
+    return os.path.join(config.DIR_PATH, config.DOWNLOAD_FILE)
+
+
+def get_save_file_path():
+    now = datetime.utcnow()
+    save_file = config.SAVE_FILE_FORMAT.format(
+        yyyy=now.year, mm=now.month, dd=now.day, hour=now.hour, minute=now.minute)
+    return os.path.join(config.DIR_PATH, save_file)
+
+
+def ensure_dir():
+    path = config.DIR_PATH
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 if __name__ == "__main__":
+    ensure_dir()
     Earth.get()
-    Earth.resize()
-    Earth.set()
+    Earth.set(Earth.resize())
