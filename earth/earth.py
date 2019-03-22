@@ -72,12 +72,23 @@ def get_save_file_path():
 
 
 def ensure_dir():
-    path = config.DIR_PATH
-    if not os.path.exists(path):
-        os.makedirs(path)
+    dir_path = config.DIR_PATH
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+
+
+def ensure_space():
+    dir_path = config.DIR_PATH
+    cur_file_count = len(os.listdir(dir_path))
+    while cur_file_count >= config.MAX_FILE_COUNT:
+        files_full_path = [os.path.join(dir_path, x) for x in os.listdir(dir_path)]
+        oldest_file = min(files_full_path, key=os.path.getctime)
+        os.remove(oldest_file)
+        cur_file_count -= 1
 
 
 if __name__ == "__main__":
     ensure_dir()
+    ensure_space()
     Earth.get()
     Earth.set(Earth.resize())
