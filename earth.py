@@ -7,8 +7,13 @@ import urllib.request
 from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 
-import config
-
+# Config
+EARTH_URI = "http://rammb.cira.colostate.edu/ramsdis/online/images/latest_hi_res/himawari-8/full_disk_ahi_true_color.jpg"
+DIR_PATH = os.path.expanduser("~/.earth")
+DOWNLOAD_FILE = "latest.jpg"
+SAVE_FILE_FORMAT = "Earth-{yyyy}{mm:0>2}{dd:0>2}-{hour:0>2}{minute:0>2}.png"
+MAX_FILE_COUNT = 50
+CAPTION_FORMAT = "Real-Time Earth from Himawari-8\n{yyyy}-{mm:0>2}-{dd:0>2} {hour:0>2}:{minute:0>2} Local Time"
 
 # Constants
 SCREEN_X_LEN = 2560  # Width
@@ -40,7 +45,7 @@ class Earth:
     @staticmethod
     def get():
         try:
-            res = urllib.request.urlopen(config.EARTH_URI)
+            res = urllib.request.urlopen(EARTH_URI)
         except ConnectionResetError:
             return False
         with open(get_download_file_path(), 'wb') as f:
@@ -71,7 +76,7 @@ class Earth:
         script_dir = os.path.dirname(__file__)
         font = ImageFont.truetype(os.path.join(script_dir, "fonts/Heebo-Light.ttf"), FONT_SIZE)
         now = datetime.now()
-        caption = config.CAPTION_FORMAT.format(
+        caption = CAPTION_FORMAT.format(
             yyyy=now.year, mm=now.month, dd=now.day, hour=now.hour, minute=now.minute)
         img_draw = ImageDraw.Draw(res)
         img_draw.text((CAPTION_X_OFFSET, CAPTION_Y_OFFSET), caption, font=font, fill='white')
@@ -84,26 +89,26 @@ class Earth:
 
 
 def get_download_file_path():
-    return os.path.join(config.DIR_PATH, config.DOWNLOAD_FILE)
+    return os.path.join(DIR_PATH, DOWNLOAD_FILE)
 
 
 def get_save_file_path():
     now = datetime.utcnow()
-    save_file = config.SAVE_FILE_FORMAT.format(
+    save_file = SAVE_FILE_FORMAT.format(
         yyyy=now.year, mm=now.month, dd=now.day, hour=now.hour, minute=now.minute)
-    return os.path.join(config.DIR_PATH, save_file)
+    return os.path.join(DIR_PATH, save_file)
 
 
 def ensure_dir():
-    dir_path = config.DIR_PATH
+    dir_path = DIR_PATH
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
 
 
 def ensure_space():
-    dir_path = config.DIR_PATH
+    dir_path = DIR_PATH
     cur_file_count = len(os.listdir(dir_path))
-    while cur_file_count >= config.MAX_FILE_COUNT:
+    while cur_file_count >= MAX_FILE_COUNT:
         files_full_path = [os.path.join(dir_path, x) for x in os.listdir(dir_path)]
         oldest_file = min(files_full_path, key=os.path.getctime)
         os.remove(oldest_file)

@@ -19,5 +19,5 @@ Add a crontab:
 ```
 crontab -e
 # Write to file
-*/10 * * * * PYTHONPATH=<path/to/repo> /usr/local/bin/python3 <path/to/repo>/earth/earth.py
+*/10 * * * * /usr/local/bin/python3 <path/to/repo>/earth.py
 ```
