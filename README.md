@@ -12,12 +12,12 @@ macOS Mojave (Tested)
 
 ```
 brew install python3
-pip3 install Pillow
+python3 setup.py install
 ```
 
 Add a crontab:
 ```
 crontab -e
 # Write to file
-*/10 * * * * /usr/local/bin/python3 <path/to/repo>/earth.py
+*/10 * * * * /usr/local/bin/python3 -m earth
 ```
