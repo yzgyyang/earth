@@ -33,10 +33,19 @@ CAPTION_Y_OFFSET = int(SCREEN_Y_LEN * CAPTION_Y_RATIO)
 
 
 class Earth:
+    def run(self):
+        if self.get():
+            self.set(self.resize())
+
     @staticmethod
     def get():
-        with urllib.request.urlopen(config.EARTH_URI) as res, open(get_download_file_path(), 'wb') as f:
+        try:
+            res = urllib.request.urlopen(config.EARTH_URI)
+        except ConnectionResetError:
+            return False
+        with open(get_download_file_path(), 'wb') as f:
             shutil.copyfileobj(res, f)
+        return True
 
     @staticmethod
     def set(file_path):
@@ -104,5 +113,5 @@ def ensure_space():
 if __name__ == "__main__":
     ensure_dir()
     ensure_space()
-    Earth.get()
-    Earth.set(Earth.resize())
+    earth = Earth()
+    earth.run()
