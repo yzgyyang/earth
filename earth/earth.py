@@ -5,7 +5,7 @@ import subprocess
 import urllib.request
 
 from datetime import datetime
-from PIL import Image
+from PIL import Image, ImageDraw, ImageFont
 
 import config
 
@@ -16,6 +16,9 @@ SCREEN_Y_LEN = 1600  # Height
 RESIZE_RATIO = 0.9  # Resize Earth with respect to SCREEN_Y_LEN
 MODAL_X_RATIO = 0.18  # Resize Medal with respect to RESIZE_LEN
 MODAL_Y_RATIO = 0.07
+CAPTION_X_RATIO = 0.81
+CAPTION_Y_RATIO = 0.9
+FONT_SIZE = 24
 
 # Calculated constants
 RESIZE_LEN = int(SCREEN_Y_LEN * RESIZE_RATIO)
@@ -25,6 +28,8 @@ MODAL_X_OFFSET = 0
 MODAL_Y_OFFSET = int(RESIZE_LEN * (1 - MODAL_Y_RATIO))
 EARTH_X_OFFSET = int((SCREEN_X_LEN - RESIZE_LEN) / 2)
 EARTH_Y_OFFSET = int((SCREEN_Y_LEN - RESIZE_LEN) / 2)
+CAPTION_X_OFFSET = int(SCREEN_X_LEN * CAPTION_X_RATIO)
+CAPTION_Y_OFFSET = int(SCREEN_Y_LEN * CAPTION_Y_RATIO)
 
 
 class Earth:
@@ -52,6 +57,15 @@ class Earth:
         # Paste Earth to a black background
         res = Image.new("RGBA", (SCREEN_X_LEN, SCREEN_Y_LEN), (0, 0, 0, 255))
         res.paste(im, (EARTH_X_OFFSET, EARTH_Y_OFFSET))
+
+        # Add Caption
+        script_dir = os.path.dirname(__file__)
+        font = ImageFont.truetype(os.path.join(script_dir, "fonts/Heebo-Light.ttf"), FONT_SIZE)
+        now = datetime.now()
+        caption = config.CAPTION_FORMAT.format(
+            yyyy=now.year, mm=now.month, dd=now.day, hour=now.hour, minute=now.minute)
+        img_draw = ImageDraw.Draw(res)
+        img_draw.text((CAPTION_X_OFFSET, CAPTION_Y_OFFSET), caption, font=font, fill='white')
 
         # Save to PNG file
         save_file_path = get_save_file_path()
