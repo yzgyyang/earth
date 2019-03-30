@@ -5,7 +5,7 @@ with open("requirements.txt") as requirements:
     install_requires = requirements.read().splitlines()
 
 if __name__ == "__main__":
-    setup(name="earth",
+    setup(name="earthpaper",
           version="0.1",
           description="Make Earth your real time wallpaper",
           license="BSD-3-Clause",

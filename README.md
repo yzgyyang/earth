@@ -1,4 +1,4 @@
-# Earth
+# Earthpaper
 
 Make Earth your real time wallpaper!
 
@@ -19,5 +19,5 @@ Add a crontab:
 ```
 crontab -e
 # Write to file
-*/10 * * * * /usr/local/bin/python3 -m earth
+*/10 * * * * /usr/local/bin/python3 -m earthpaper
 ```
