@@ -40,7 +40,9 @@ CAPTION_Y_OFFSET = int(SCREEN_Y_LEN * CAPTION_Y_RATIO)
 class Earth:
     def run(self):
         if self.get():
-            self.set(self.resize())
+            image_path = self.resize()
+            if image_path:
+                self.set(image_path)
 
     @staticmethod
     def get():
@@ -61,8 +63,11 @@ class Earth:
     def resize():
         im = Image.open(get_download_file_path())
 
-        # Resize Earth
-        im.thumbnail((RESIZE_LEN, RESIZE_LEN), Image.ANTIALIAS)
+        # Resize Earth (may fail - see issue #1)
+        try:
+            im.thumbnail((RESIZE_LEN, RESIZE_LEN), Image.ANTIALIAS)
+        except OSError:
+            return None
 
         # Paste a black modal
         modal = Image.new("RGBA", (MODAL_X_LEN, MODAL_Y_LEN), (0, 0, 0, 255))
